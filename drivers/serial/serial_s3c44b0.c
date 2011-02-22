@@ -48,7 +48,7 @@ static int serial_flush_input(void)
 
 	/* keep on reading as long as the receiver is not empty */
 	while(UTRSTAT0&0x01) {
-		tmp = REGB(URXH0);
+		tmp = URXH0;
 	}
 
 	return 0;
@@ -70,68 +70,7 @@ static int serial_flush_output(void)
 
 void serial_setbrg (void)
 {
-	u32 divisor = 0;
-
-	/* get correct divisor */
-	switch(gd->baudrate) {
-
-	case 1200:
-#if CONFIG_S3C44B0_CLOCK_SPEED==66
-		divisor = 3124;
-#elif CONFIG_S3C44B0_CLOCK_SPEED==75
-		divisor = 3905;
-#else
-# error CONFIG_S3C44B0_CLOCK_SPEED undefined
-#endif
-		break;
-
-	case 9600:
-#if CONFIG_S3C44B0_CLOCK_SPEED==66
-		divisor = 390;
-#elif CONFIG_S3C44B0_CLOCK_SPEED==75
-		divisor = 487;
-#else
-# error CONFIG_S3C44B0_CLOCK_SPEED undefined
-#endif
-		break;
-
-	case 19200:
-#if CONFIG_S3C44B0_CLOCK_SPEED==66
-		divisor = 194;
-#elif CONFIG_S3C44B0_CLOCK_SPEED==75
-		divisor = 243;
-#else
-# error CONFIG_S3C44B0_CLOCK_SPEED undefined
-#endif
-		break;
-
-	case 38400:
-#if CONFIG_S3C44B0_CLOCK_SPEED==66
-		divisor = 97;
-#elif CONFIG_S3C44B0_CLOCK_SPEED==75
-		divisor = 121;
-#else
-# error CONFIG_S3C44B0_CLOCK_SPEED undefined
-#endif	/* break; */
-
-	case 57600:
-#if CONFIG_S3C44B0_CLOCK_SPEED==66
-		divisor = 64;
-#elif CONFIG_S3C44B0_CLOCK_SPEED==75
-		divisor = 80;
-#else
-# error CONFIG_S3C44B0_CLOCK_SPEED undefined
-#endif	/* break; */
-
-	case 115200:
-#if CONFIG_S3C44B0_CLOCK_SPEED==66
-		divisor = 32;
-#elif CONFIG_S3C44B0_CLOCK_SPEED==75
-		divisor = 40;
-#else
-# error CONFIG_S3C44B0_CLOCK_SPEED undefined
-#endif	/* break; */
-	}
+	u32 divisor = BRD(gd->baudrate);
 
 	serial_flush_output();
 	serial_flush_input();

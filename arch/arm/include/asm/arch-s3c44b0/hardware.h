@@ -11,7 +11,8 @@
 #define REGL(addr)	(*(volatile unsigned int *)(REGBASE+addr))
 #define REGW(addr)	(*(volatile unsigned short *)(REGBASE+addr))
 #define REGB(addr)	(*(volatile unsigned char *)(REGBASE+addr))
-
+#define BRD(bps)	(DIV_ROUND(CONFIG_S3C44B0_CLOCK_SPEED * 1000000, \
+				(bps)*16) - 1)
 
 /*****************************/
 /* CPU Wrapper Registers     */
