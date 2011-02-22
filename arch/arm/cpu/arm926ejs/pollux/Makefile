@@ -29,7 +29,9 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(SOC).o
 
-COBJS	= timer.o reset.o
+COBJS	= dram.o \
+	  reset.o \
+	  timer.o
 
 SRCS	:= $(START:.o=.S) $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))

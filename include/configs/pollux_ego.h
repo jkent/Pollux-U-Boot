@@ -41,10 +41,6 @@
 #define CONFIG_SKIP_RELOCATE_UBOOT
 #define CONFIG_SKIP_LOWLEVEL_INIT
 
-#define CONFIG_ENV_SIZE			(128 << 10)	/* 128k */
-#define CONFIG_ENV_ADDR			0x01800000
-
-
 /* memory layout */
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0x00000000
@@ -84,7 +80,7 @@
 	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_MAXARGS		16
 
-//#define CONFIG_MAX_RAM_BANK_SIZE        (128 << 20)	/* 128 MB */
+#define CONFIG_MAX_RAM_BANK_SIZE        (128 << 20)	/* 128 MB */
 
 #define CONFIG_SYS_SDRAM_BASE           PHYS_SDRAM_1
 #define CONFIG_SYS_INIT_SP_ADDR \

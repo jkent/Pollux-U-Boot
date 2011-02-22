@@ -27,6 +27,7 @@
  */
 
 #include <common.h>
+#include <config.h>
 #include <asm/io.h>
 #include <asm/arch/clkpwr.h>
 #include <asm/arch/gpio.h>
@@ -94,12 +95,5 @@ int board_init(void)
 		&uart->uartclkgen);
 	writel(UART_CLKGENENB | UART_PCLKMODE, &uart->uartclkenb);
 
-	return 0;
-}
-
-int dram_init(void)
-{
-	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
-	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
 	return 0;
 }
