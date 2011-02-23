@@ -39,7 +39,7 @@
 #ifndef __ASSEMBLY__
 #include <asm/types.h>
 
-struct uart_regs {
+struct pollux_uart {
 	__u16	lcon;
 	__u16	ucon;
 	__u16	fcon;

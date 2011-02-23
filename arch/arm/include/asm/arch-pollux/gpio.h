@@ -34,7 +34,7 @@
 #define GPIOC_BASE		0xC000A080
 #endif
 
-struct gpio_regs {
+struct pollux_gpio {
 	u32 gpioout;
 	u32 gpiooutenb;
 	u32 gpiodetmode0;

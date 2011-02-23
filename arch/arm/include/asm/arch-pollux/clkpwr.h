@@ -33,7 +33,7 @@
 #ifndef __ASSEMBLY__
 #include <asm/types.h>
 
-struct clkpwr_regs {
+struct pollux_clkpwr {
 	u32	clkmodereg;
 	u32	pllsetreg0;
 	u32	pllsetreg1;

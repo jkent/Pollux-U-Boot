@@ -1,22 +1,27 @@
 /*
+ * (C) Copyright 2011 Jeff Kent, <jakent@gmail.com>
+ *
  * (C) Copyright 2010 cozybit, Inc.
  * Brian Cavagnolo, <brian@cozybit.com>
  *
- * (C) Copyright 2010 Jeff Kent, <jakent@gmail.com>
- *
- * (C) Copyright 2008
- * Texas Instruments
- *
- * Richard Woodruff <r-woodruff2@ti.com>
- * Syed Moahmmed Khasim <khasim@ti.com>
+ * (C) Copyright 2003
+ * Texas Instruments <www.ti.com>
  *
  * (C) Copyright 2002
  * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
  * Marius Groeger <mgroeger@sysgo.de>
- * Alex Zuepke <azu@sysgo.de>
  *
  * (C) Copyright 2002
+ * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
+ * Alex Zuepke <azu@sysgo.de>
+ *
+ * (C) Copyright 2002-2004
  * Gary Jennejohn, DENX Software Engineering, <garyj@denx.de>
+ *
+ * (C) Copyright 2004
+ * Philippe Robin, ARM Ltd. <philippe.robin@arm.com>
+ *
+ * Copyright (C) 2007 Sergey Kubushyn <ksi@koi8.net>
  *
  * See file CREDITS for list of people who contributed to this
  * project.
@@ -28,24 +33,23 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301 USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
  */
 
 #include <common.h>
 #include <asm/io.h>
 #include <asm/arch/timer.h>
 
-static struct timer_regs *timer = (struct timer_regs *)CONFIG_SYS_TIMERBASE;
-static ulong timestamp;
-static ulong lastinc;
+DECLARE_GLOBAL_DATA_PTR;
 
-/* Calculate the required clock divider to achieve CONFIG_SYS_HZ */
+static struct pollux_timer *timer = (struct pollux_timer *)CONFIG_SYS_TIMERBASE;
+
 #if CONFIG_SYS_TIMER_PLL == 0
 #define TIMER_HZ_IN CONFIG_SYS_HZ_PLL0
 #elif CONFIG_SYS_TIMER_PLL == 1
@@ -54,10 +58,7 @@ static ulong lastinc;
 #error "Invalid timer PLL"
 #endif
 
-#define TIMER_CLOCK	(TIMER_HZ_IN / CONFIG_SYS_TIMER_CLKDIV \
-			 / (1<<CONFIG_SYS_TIMER_SELTCLK_LOG2))
-
-#define TIMER_LOAD_VAL 0xffffffff
+#define TIMER_MATCH_VAL 0xffffffff
 
 int timer_init(void)
 {
@@ -69,12 +70,13 @@ int timer_init(void)
 	/* enable clock */
 	writel(TIMER_CLKGENENB | TIMER_TCLKMODE, &timer->tmrclkenb);
 	writel(0, &timer->tmrcount);
-	writel(TIMER_LOAD_VAL, &timer->tmrmatch);
+	writel(TIMER_MATCH_VAL, &timer->tmrmatch);
 	writel(TIMER_SELTCLK(CONFIG_SYS_TIMER_SELTCLK_LOG2) | TIMER_RUN |
 		TIMER_INTPEND, &timer->tmrcontrol);
 
-	/* init the timestamp and lastinc value */
-	reset_timer_masked();
+	gd->timer_rate_hz = (TIMER_HZ_IN / CONFIG_SYS_TIMER_CLKDIV /
+				(1<<CONFIG_SYS_TIMER_SELTCLK_LOG2));
+	gd->timer_reset_value = 0;
 
 	return 0;
 }
@@ -84,73 +86,43 @@ int timer_init(void)
  */
 void reset_timer(void)
 {
-	reset_timer_masked();
+	gd->timer_reset_value = get_ticks();
+}
+
+/*
+ * Get the current 64 bit timer tick count
+ */
+unsigned long long get_ticks(void)
+{
+	unsigned long now;
+
+	writel(readl(&timer->tmrcontrol) | TIMER_LDCNT, &timer->tmrcontrol);
+	now = readl(&timer->tmrcount);
+
+	if (now < gd->tbl)
+		gd->tbu++;
+	gd->tbl = now;
+
+	return (((unsigned long long)gd->tbu) << 32) | gd->tbl;
 }
 
 ulong get_timer(ulong base)
 {
-	return get_timer_masked() - base;
+	unsigned long long timer_diff;
+
+	timer_diff = get_ticks() - gd->timer_reset_value;
+
+	return (timer_diff / (gd->timer_rate_hz / CONFIG_SYS_HZ)) - base;
 }
 
-void set_timer(ulong t)
-{
-	timestamp = t;
-}
-
-static inline ulong read_timer(void)
-{
-	writel(readl(&timer->tmrcontrol) | TIMER_LDCNT, &timer->tmrcontrol);
-	return readl(&timer->tmrcount);
-}
-
-/* delay x useconds */
 void __udelay(unsigned long usec)
 {
-	long tmo = usec * (CONFIG_SYS_HZ / 1000) / 1000;
-	unsigned long now, last;
+	unsigned long long endtime;
 
-	last = read_timer();
-
-	while (tmo > 0) {
-		now = read_timer();
-		if (last > now) /* count up timer overflow */
-			tmo -= TIMER_LOAD_VAL - last + now;
-		else
-			tmo -= now - last;
-		last = now;
-	}
-}
-
-void reset_timer_masked(void)
-{
-	/* reset time, capture current incrementer value time */
-	lastinc = read_timer();
-	timestamp = 0;		/* start "advancing" time stamp from 0 */
-}
-
-ulong get_timer_masked(void)
-{
-	ulong now;
-
-	/* current tick value */
-	now = read_timer();
-
-	if (now >= lastinc)	/* normal mode (non roll) */
-		/* move stamp fordward with absoulte diff ticks */
-		timestamp += (now - lastinc);
-	else	/* we have rollover of incrementer */
-		timestamp += (TIMER_LOAD_VAL - lastinc) + now;
-	lastinc = now;
-	return timestamp;
-}
-
-/*
- * This function is derived from PowerPC code (read timebase as long long).
- * On ARM it just returns the timer value.
- */
-unsigned long long get_ticks(void)
-{
-	return get_timer(0);
+	endtime = ((unsigned long long)usec * gd->timer_rate_hz) / 1000000UL;
+	endtime += get_ticks();
+	while (get_ticks() < endtime)
+		;
 }
 
 /*

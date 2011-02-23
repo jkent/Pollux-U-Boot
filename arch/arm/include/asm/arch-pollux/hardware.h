@@ -10,7 +10,7 @@
 /* s3c44b0 serial driver looks for our uart definitions here in hardware.h */
 #include <asm/arch/uart.h>
 
-#define REG(b, m) *((volatile u16 *)&(((struct uart_regs *)(b))->m))
+#define REG(b, m) *((volatile u16 *)&(((struct pollux_uart *)(b))->m))
 
 #define ULCON0		REG(UART0_BASE, lcon)
 #define UCON0		REG(UART0_BASE, ucon)

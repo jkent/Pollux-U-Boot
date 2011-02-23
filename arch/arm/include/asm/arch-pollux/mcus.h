@@ -33,7 +33,7 @@
 #ifndef __ASSEMBLY__
 #include <asm/types.h>
 
-struct mcus_regs {
+struct pollux_mcus {
 	__u32	bw;
 	__u32	timeacs;
 	__u32	timecos;

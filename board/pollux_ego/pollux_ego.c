@@ -36,10 +36,10 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-static struct clkpwr_regs *clkpwr = (struct clkpwr_regs *)CLKPWR_BASE;
-static struct gpio_regs *gpioa = (struct gpio_regs *)GPIOA_BASE;
-static struct mcus_regs *mcus = (struct mcus_regs *)MCUS_BASE;
-static struct uart_regs *uart = (struct uart_regs *)UART0_BASE;
+static struct pollux_clkpwr *clkpwr = (struct pollux_clkpwr *)CLKPWR_BASE;
+static struct pollux_gpio *gpioa = (struct pollux_gpio *)GPIOA_BASE;
+static struct pollux_mcus *mcus = (struct pollux_mcus *)MCUS_BASE;
+static struct pollux_uart *uart = (struct pollux_uart *)UART0_BASE;
 
 /*
  * UART clock divider is calculated such that the default BRD corresponds to

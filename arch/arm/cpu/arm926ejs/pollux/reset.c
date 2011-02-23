@@ -24,7 +24,7 @@
 #include <asm/io.h>
 #include <asm/arch/clkpwr.h>
 
-static struct clkpwr_regs *clkpwr = (struct clkpwr_regs *)CLKPWR_BASE;
+static struct pollux_clkpwr *clkpwr = (struct pollux_clkpwr *)CLKPWR_BASE;
 
 void reset_cpu(ulong ignored)
 {

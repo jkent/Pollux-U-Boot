@@ -42,7 +42,7 @@
 #ifndef __ASSEMBLY__
 #include <asm/types.h>
 
-struct timer_regs {
+struct pollux_timer {
 	__u32	tmrcount;
 	__u32	tmrmatch;
 	__u32	tmrcontrol;
