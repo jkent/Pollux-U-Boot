@@ -31,12 +31,14 @@
 #include <asm/io.h>
 #include <asm/arch/clkpwr.h>
 #include <asm/arch/gpio.h>
+#include <asm/arch/mcus.h>
 #include <asm/arch/uart.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
 static struct clkpwr_regs *clkpwr = (struct clkpwr_regs *)CLKPWR_BASE;
 static struct gpio_regs *gpioa = (struct gpio_regs *)GPIOA_BASE;
+static struct mcus_regs *mcus = (struct mcus_regs *)MCUS_BASE;
 static struct uart_regs *uart = (struct uart_regs *)UART0_BASE;
 
 /*
@@ -97,3 +99,48 @@ int board_init(void)
 
 	return 0;
 }
+
+#ifdef CONFIG_NET_MULTI
+int board_eth_init(bd_t *bis)
+{
+	int rc = 0;
+
+#ifdef CONFIG_DRIVER_DM9000
+	ulong tmp;
+
+	/* Configure 0x84000000 space */
+	/* TODO: tune settings and make macros/functions */
+	tmp = readl(&mcus->bw) & ~(1<<MCUS_SR1BW);
+	writel(tmp | (MCUS_16BIT<<MCUS_SR1BW), &mcus->bw);
+
+	tmp = readl(&mcus->timeacs) & ~(3<<MCUS_TACS1);
+	writel(tmp | (MCUS_3CYCLE<<MCUS_TACS1), &mcus->timeacs);
+
+	tmp = readl(&mcus->timecos) & ~(3<<MCUS_TCOS1);
+	writel(tmp | (MCUS_3CYCLE<<MCUS_TCOS1), &mcus->timecos);
+
+	tmp = readl(&mcus->timeaccl) & ~(15<<MCUS_TACC1);
+	writel(tmp | (15<<MCUS_TACC1), &mcus->timeaccl);
+
+	tmp = readl(&mcus->timesaccl) & ~(15<<MCUS_TSACC1);
+	writel(tmp | (15<<MCUS_TSACC1), &mcus->timesaccl);
+
+	tmp = readl(&mcus->timecoh) & ~(3<<MCUS_TCOH1);
+	writel(tmp | (MCUS_3CYCLE<<MCUS_TCOH1), &mcus->timecoh);
+
+	tmp = readl(&mcus->timecah) & ~(3<<MCUS_TCAH1);
+	writel(tmp | (MCUS_3CYCLE<<MCUS_TCAH1), &mcus->timecah);
+
+	tmp = readl(&mcus->burstl) & ~((3<<MCUS_BREAD1) | (3<<MCUS_BWRITE1));
+	writel(tmp | (MCUS_0BYTE<<MCUS_BREAD1) | (MCUS_0BYTE<<MCUS_BWRITE1),
+		&mcus->burstl);
+
+	tmp = readl(&mcus->wait) & ~((1<<MCUS_WAITPOL1) | (1<<MCUS_WAITENB1));
+	writel(tmp | (MCUS_LOW<<MCUS_WAITPOL1) | (MCUS_OFF<<MCUS_WAITENB1),
+		&mcus->wait);
+
+	rc += dm9000_initialize(bis);
+#endif
+	return rc;
+}
+#endif

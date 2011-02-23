@@ -35,7 +35,7 @@
 #include <asm/arch/uart.h>
 #include <asm/arch/timer.h>
 
-/* didj has minimal support for now, so turn lots of stuff off */
+/* minimal support for now, so turn lots of stuff off */
 #define CONFIG_SYS_NO_FLASH
 #define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_SKIP_RELOCATE_UBOOT
@@ -72,6 +72,14 @@
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 #define CONFIG_SYS_BAUDRATE_MAX		115200
 
+/* ethernet configuration */
+#define CONFIG_CMD_NET
+#define CONFIG_NET_MULTI
+#define CONFIG_DRIVER_DM9000
+#define CONFIG_DM9000_BASE		0x84000000 /* cs1, shadow = 1 */
+#define DM9000_IO			CONFIG_DM9000_BASE
+#define DM9000_DATA			(CONFIG_DM9000_BASE + 4)
+
 /* console/printing setup */
 #define CONFIG_SYS_PROMPT "=> "
 #define CONFIG_SYS_LONGHELP
@@ -81,6 +89,8 @@
 #define CONFIG_SYS_MAXARGS		16
 
 #define CONFIG_MAX_RAM_BANK_SIZE        (128 << 20)	/* 128 MB */
+
+#define CONFIG_CMD_MISC
 
 #define CONFIG_SYS_SDRAM_BASE           PHYS_SDRAM_1
 #define CONFIG_SYS_INIT_SP_ADDR \
