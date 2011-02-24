@@ -34,10 +34,10 @@
 
 #include <asm/arch/uart.h>
 #include <asm/arch/timer.h>
+#include <asm/arch/nand.h>
 
 /* minimal support for now, so turn lots of stuff off */
 #define CONFIG_SYS_NO_FLASH
-#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_SKIP_RELOCATE_UBOOT
 #define CONFIG_SKIP_LOWLEVEL_INIT
 
@@ -46,8 +46,10 @@
 #define PHYS_SDRAM_1			0x00000000
 #define PHYS_SDRAM_1_SIZE		(128 << 20)	/* 128 MiB */
 #define CONFIG_SYS_GBL_DATA_SIZE	128
-#define CONFIG_ENV_SIZE			8192
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+#define CONFIG_ENV_IS_IN_NAND
+#define CONFIG_ENV_SIZE			(32 << 10)	/* 32 KiB */
+#define CONFIG_ENV_OFFSET		0x00380000
+#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 1024 * 1024)
 #define CONFIG_STACKSIZE		(128 * 1024)
 #define CONFIG_SYS_TEXT_BASE		0x01000000
 #define CONFIG_SYS_LOAD_ADDR		0x00008000
@@ -78,6 +80,24 @@
 #define DM9000_IO			CONFIG_DM9000_BASE
 #define DM9000_DATA			(CONFIG_DM9000_BASE + 4)
 
+/* nand configuration */
+#define CONFIG_NAND_POLLUX
+#define CONFIG_SYS_NAND_SW_ECC
+#define CONFIG_SYS_NAND_BASE		NAND_SHADOW_BASE
+#define CONFIG_SYS_NAND_QUIET_TEST
+#define CONFIG_SYS_MAX_NAND_DEVICE	1
+/*#define CONFIG_MTD_DEBUG
+#define CONFIG_MTD_DEBUG_VERBOSE	3*/
+
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_MTD_DEVICE
+#define CONFIG_CMD_NAND
+#define CONFIG_CMD_UBI
+#define CONFIG_RBTREE
+#define CONFIG_CMD_NAND_LOCK_UNLOCK
+#define CONFIG_CMD_SAVEENV
+
 /* console/printing setup */
 #define CONFIG_SYS_PROMPT "=> "
 #define CONFIG_SYS_LONGHELP
@@ -87,8 +107,6 @@
 #define CONFIG_SYS_MAXARGS		16
 
 #define CONFIG_MAX_RAM_BANK_SIZE        (128 << 20)	/* 128 MB */
-
-#define CONFIG_CMD_MISC
 
 #define CONFIG_SYS_SDRAM_BASE           PHYS_SDRAM_1
 #define CONFIG_SYS_INIT_SP_ADDR \

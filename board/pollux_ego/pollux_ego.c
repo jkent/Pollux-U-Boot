@@ -28,7 +28,10 @@
 
 #include <common.h>
 #include <config.h>
+#include <nand.h>
+#include <netdev.h>
 #include <asm/io.h>
+#include <asm/arch/alive.h>
 #include <asm/arch/clkpwr.h>
 #include <asm/arch/gpio.h>
 #include <asm/arch/mcus.h>
@@ -36,6 +39,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+static struct pollux_alive *alive = (struct pollux_alive *)ALIVE_BASE;
 static struct pollux_clkpwr *clkpwr = (struct pollux_clkpwr *)CLKPWR_BASE;
 static struct pollux_gpio *gpioa = (struct pollux_gpio *)GPIOA_BASE;
 static struct pollux_mcus *mcus = (struct pollux_mcus *)MCUS_BASE;
@@ -54,6 +58,23 @@ static struct pollux_uart *uart = (struct pollux_uart *)UART0_BASE;
 #endif
 #define UARTDIV \
 	DIV_ROUND(UART_HZ_IN, CONFIG_SYS_BAUDRATE_MAX*(DEFAULT_BRD + 1)*16)
+
+#define WP(n) \
+	if (n) { \
+		writel(1, &alive->pwrgate); \
+		writel(0, &alive->gpioset); \
+		writel((1<<ALIVE_GPIO0), &alive->gpiorst); \
+		writel(0, &alive->gpiorst); \
+		writel(0, &alive->pwrgate); \
+	}else { \
+		writel(1, &alive->pwrgate); \
+		writel(0, &alive->gpiorst); \
+		writel((1<<ALIVE_GPIO0), &alive->gpioset); \
+		writel(0, &alive->gpioset); \
+		writel(0, &alive->pwrgate); \
+	}
+
+
 
 int board_init(void)
 {
@@ -142,5 +163,18 @@ int board_eth_init(bd_t *bis)
 	rc += dm9000_initialize(bis);
 #endif
 	return rc;
+}
+#endif
+
+#ifdef CONFIG_NAND_POLLUX
+int pollux_nand_init(struct nand_chip *this);
+
+int board_nand_init(struct nand_chip *nand)
+{
+	WP(0);
+
+	writel(readl(&mcus->nfcontrol) | (1<<MCUS_NFBANK), &mcus->nfcontrol);
+
+	return pollux_nand_init(nand);
 }
 #endif
