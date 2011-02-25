@@ -50,8 +50,6 @@
 
 /* memory info */
 #define CONFIG_NR_DRAM_BANKS		1
-#define PHYS_SDRAM_1			0x00000000
-#define PHYS_SDRAM_1_SIZE		(128 << 20)	/* 128 MiB */
 #define CONFIG_SYS_TEXT_BASE		0x01000000
 
 /* timer set up */
@@ -139,7 +137,7 @@
 #define CONFIG_STACKSIZE		(256 << 10)	/* 256 KiB */
 #define CONFIG_SYS_MALLOC_LEN		(1 << 20)	/* 1 MiB */
 #define CONFIG_MAX_RAM_BANK_SIZE	(128 << 20)	/* 128 MB */
-#define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
+#define CONFIG_SYS_SDRAM_BASE		0x00000000
 #define CONFIG_SYS_INIT_SP_ADDR		\
 	(CONFIG_SYS_SDRAM_BASE + 0x8000 - GENERATED_GBL_DATA_SIZE)
 

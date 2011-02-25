@@ -25,15 +25,19 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-int dram_init (void)
+#ifndef CONFIG_PRELOADER
+int dram_init(void)
 {
-	gd->ram_size = get_ram_size(CONFIG_SYS_SDRAM_BASE,
+	/* dram_init must store complete ramsize in gd->ram_size */
+	gd->ram_size = get_ram_size(
+			(volatile void *)CONFIG_SYS_SDRAM_BASE,
 			CONFIG_MAX_RAM_BANK_SIZE);
 	return 0;
 }
 
-void dram_init_banksize (void)
+void dram_init_banksize(void)
 {
-	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
-	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
+	gd->bd->bi_dram[0].start = CONFIG_SYS_SDRAM_BASE;
+	gd->bd->bi_dram[0].size = gd->ram_size;
 }
+#endif

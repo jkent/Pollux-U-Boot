@@ -74,13 +74,14 @@ static struct pollux_uart *uart = (struct pollux_uart *)UART0_BASE;
 		writel(0, &alive->pwrgate); \
 	}
 
-
-
 int board_init(void)
 {
 	unsigned long tmp;
 
 	icache_enable();
+
+	gd->bd->bi_arch_number = MACH_TYPE_DIDJ;
+	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
 
 	/* PLL0 (cpu clock) 528000000 Hz */
 	writel(CLKPWR_MDIV(9)|CLKPWR_PDIV(176)|CLKPWR_SDIV(0),

@@ -43,7 +43,7 @@ struct pollux_clkpwr {
 	u32	gpiowakeupriseenb;
 	u32	gpiowakeupfallenb;
 	u32	gpiopend;
-	u32	_reserved2[1];
+	u32	_reserved2;
 	u32	intpendspad;
 	u32	pwrrstatus;
 	u32	intenb;
