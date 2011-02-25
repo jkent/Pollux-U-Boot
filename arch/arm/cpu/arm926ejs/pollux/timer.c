@@ -48,33 +48,23 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-static struct pollux_timer *timer = (struct pollux_timer *)CONFIG_SYS_TIMERBASE;
-
-#if CONFIG_SYS_TIMER_PLL == 0
-#define TIMER_HZ_IN CONFIG_SYS_HZ_PLL0
-#elif CONFIG_SYS_TIMER_PLL == 1
-#define TIMER_HZ_IN CONFIG_SYS_HZ_PLL1
-#else
-#error "Invalid timer PLL"
-#endif
-
-#define TIMER_MATCH_VAL 0xffffffff
+static struct pollux_timer *timer = (struct pollux_timer *)TIMER0_BASE;
 
 int timer_init(void)
 {
 	/* configure clock source and primary divisor */
 	writel(TIMER_CLKDIV(CONFIG_SYS_TIMER_CLKDIV) |
-		TIMER_CLKSRCSEL(CONFIG_SYS_TIMER_PLL),
+		TIMER_CLKSRCSEL(1),
 		&timer->tmrclkgen);
 
 	/* enable clock */
 	writel(TIMER_CLKGENENB | TIMER_TCLKMODE, &timer->tmrclkenb);
 	writel(0, &timer->tmrcount);
-	writel(TIMER_MATCH_VAL, &timer->tmrmatch);
+	writel(0xFFFFFFFF, &timer->tmrmatch);
 	writel(TIMER_SELTCLK(CONFIG_SYS_TIMER_SELTCLK_LOG2) | TIMER_RUN |
 		TIMER_INTPEND, &timer->tmrcontrol);
 
-	gd->timer_rate_hz = (TIMER_HZ_IN / CONFIG_SYS_TIMER_CLKDIV /
+	gd->timer_rate_hz = (CONFIG_SYS_HZ_PLL1 / CONFIG_SYS_TIMER_CLKDIV /
 				(1<<CONFIG_SYS_TIMER_SELTCLK_LOG2));
 	gd->timer_reset_value = 0;
 

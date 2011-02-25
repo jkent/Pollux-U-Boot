@@ -46,7 +46,6 @@
 #define CONFIG_SYS_HZ			1024
 
 #include <asm/arch/uart.h>
-#include <asm/arch/timer.h>
 #include <asm/arch/nand.h>
 
 /* memory info */
@@ -56,8 +55,6 @@
 #define CONFIG_SYS_TEXT_BASE		0x01000000
 
 /* timer set up */
-#define CONFIG_SYS_TIMERBASE		TIMER0_BASE
-#define CONFIG_SYS_TIMER_PLL		1
 #define CONFIG_SYS_TIMER_CLKDIV		35
 #define CONFIG_SYS_TIMER_SELTCLK_LOG2	2
 
