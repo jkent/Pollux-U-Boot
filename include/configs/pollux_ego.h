@@ -76,12 +76,10 @@
 
 /* nand configuration */
 #define CONFIG_NAND_POLLUX
-#define CONFIG_SYS_MAX_NAND_DEVICE	1
+#define CONFIG_SYS_MAX_NAND_DEVICE	2
 #define CONFIG_SYS_NAND_BASE		NAND_SHADOW_BASE
-#define CONFIG_SYS_NAND_CS              2
 #define CONFIG_SYS_NAND_QUIET_TEST
 #define CONFIG_SYS_NAND_SW_ECC
-#define CONFIG_SYS_NAND_USE_FLASH_BBT
 
 /* console/printing setup */
 #define CONFIG_AUTO_COMPLETE

@@ -32,7 +32,7 @@
 static struct pollux_mcus *mcus = (struct pollux_mcus *)MCUS_BASE;
 static struct pollux_nand *nand = (struct pollux_nand *)CONFIG_SYS_NAND_BASE;
 
-/*static void pollux_select_chip(struct mtd_info *mtd, int chipnr)
+static void pollux_select_chip(struct mtd_info *mtd, int chipnr)
 {
 	struct nand_chip *this = mtd->priv;
 	int nand_cs = (int)this->priv;
@@ -41,7 +41,7 @@ static struct pollux_nand *nand = (struct pollux_nand *)CONFIG_SYS_NAND_BASE;
 	if (chipnr >= 0 && nand_cs > 0)
 		ctrl |= (1<<MCUS_NFBANK);
 	writel(ctrl, &mcus->nfcontrol);
-}*/
+}
 
 static void pollux_cmd_ctrl(struct mtd_info *mtd, int cmd, unsigned int ctrl)
 {
@@ -54,8 +54,8 @@ static void pollux_cmd_ctrl(struct mtd_info *mtd, int cmd, unsigned int ctrl)
 			this->IO_ADDR_W = (void __iomem *) &nand->nfaddr;
 		else
 			this->IO_ADDR_W = (void __iomem *) &nand->nfdata;
-/*		if (ctrl & NAND_NCE)
-			pollux_select_chip(mtd, (int)this->priv);*/
+		if (ctrl & NAND_NCE)
+			pollux_select_chip(mtd, (int)this->priv);
 	}
 
 	if (cmd != NAND_CMD_NONE)
@@ -64,21 +64,12 @@ static void pollux_cmd_ctrl(struct mtd_info *mtd, int cmd, unsigned int ctrl)
 
 static int pollux_dev_ready(struct mtd_info *mtdinfo)
 {
-	int cnt = 100;
-
-	/* TODO: rework this */
-	while (--cnt && (readl(&mcus->nfcontrol) & (1<<MCUS_RNB)))
-		udelay(1);
-
-	if (!cnt)
-		return 1;
-
 	return (readl(&mcus->nfcontrol) & (1<<MCUS_RNB)) ? 1 : 0;
 }
 
 int pollux_nand_init(struct nand_chip *this)
 {
-	/*static int chip_cs;*/
+	static int chip_cs;
 
 	this->IO_ADDR_R	= (void __iomem *) &nand->nfdata;
 	this->IO_ADDR_W	= (void __iomem *) &nand->nfdata;
@@ -87,11 +78,9 @@ int pollux_nand_init(struct nand_chip *this)
 
 	this->cmd_ctrl = pollux_cmd_ctrl;
 	this->dev_ready = pollux_dev_ready;
-	/*this->select_chip = pollux_select_chip;*/
-	this->chip_delay = 20;
+	this->select_chip = pollux_select_chip;
 
-
-	/*this->priv = chip_cs++;*/
+	this->priv = chip_cs++;
 
 	return 0;
 }
