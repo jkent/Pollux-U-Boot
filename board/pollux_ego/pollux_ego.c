@@ -83,21 +83,24 @@ int board_init(void)
 	gd->bd->bi_arch_number = MACH_TYPE_DIDJ;
 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
 
-	/* PLL0 (cpu clock) 528000000 Hz */
-	writel(CLKPWR_MDIV(9)|CLKPWR_PDIV(176)|CLKPWR_SDIV(0),
-		&clkpwr->pllsetreg0);
-
-	/* PLL1 (bus clock) 147461538 Hz */
-	writel(CLKPWR_MDIV(13)|CLKPWR_PDIV(142)|CLKPWR_SDIV(1),
-		&clkpwr->pllsetreg1);
-
 	/* set bus and cpu clock source and dividers */
-	writel(CLKPWR_CLKSELCPU0(0)|CLKPWR_CLKDIVCPU0(0)|CLKPWR_CLKDIV2CPU0(3)|
-		CLKPWR_CLKSELBCLK(0)|CLKPWR_CLKDIV1BCLK(3),
+	writel((15<<26) | CLKPWR_CPUPLL(0) | CLKPWR_CPUDIV(1) |
+		CLKPWR_AHBDIV(4) | CLKPWR_BCLKPLL(0) | CLKPWR_BCLKDIV(4),
 		&clkpwr->clkmodereg);
 
+	/* PLL0 (cpu clock) 528000000 Hz */
+	writel(CLKPWR_PDIV(9) | CLKPWR_MDIV(176) | CLKPWR_SDIV(0),
+		&clkpwr->pllsetreg0);
+
+	writel(readl(&clkpwr->clkmodereg) & ~CLKPWR_PLLPWDN1,
+		&clkpwr->clkmodereg);
+
+	/* PLL1 (bus clock) 147461538 Hz */
+	writel(CLKPWR_PDIV(13) | CLKPWR_MDIV(142) | CLKPWR_SDIV(1),
+		&clkpwr->pllsetreg1);
+
 	/* apply settings */
-	writel(readl(&clkpwr->pwrmode)|CLKPWR_CHGPLL, &clkpwr->clkmodereg);
+	writel(readl(&clkpwr->pwrmode)|CLKPWR_CHGPLL, &clkpwr->pwrmode);
 
 	/* wait for PLLs to stabalize */
 	while (readl(&clkpwr->pwrmode) & CLKPWR_CHGPLL)

@@ -60,11 +60,11 @@ struct pollux_clkpwr {
 };
 
 /* clkmodereg */
-#define CLKPWR_CLKSELCPU0(x)		((u32) (x) << 4)
-#define CLKPWR_CLKDIV2CPU0(x)		((u32) ((x) - 1) << 6)
-#define CLKPWR_CLKDIVCPU0(x)		((u32) ((x) - 1) << 0)
-#define CLKPWR_CLKDIV1BCLK(x)		((u32) ((x) - 1) << 20)
-#define CLKPWR_CLKSELBCLK(x)		((u32) (x) << 24)
+#define CLKPWR_CPUPLL(x)		((u32) (x) << 4)
+#define CLKPWR_AHBDIV(x)		((u32) ((x) - 1) << 6)
+#define CLKPWR_CPUDIV(x)		((u32) ((x) - 1) << 0)
+#define CLKPWR_BCLKDIV(x)		((u32) ((x) - 1) << 20)
+#define CLKPWR_BCLKPLL(x)		((u32) (x) << 24)
 #define CLKPWR_PLLPWDN1			((u32) 0x1 << 30)
 
 /* pllsetregX */
