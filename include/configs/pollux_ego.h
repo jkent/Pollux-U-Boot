@@ -1,8 +1,8 @@
 /*
+ * (C) Copyright 2011 Jeff Kent, <jakent@gmail.com>
+ *
  * (C) Copyright 2010 cozybit, Inc.
  * Brian Cavagnolo <brian@cozybit.com>
- *
- * (C) Copyright 2010 Jeff Kent, <jakent@gmail.com>
  *
  * (C) Copyright 2007 Leapfrog, Inc.
  * Kosta Demirev, kdemirev@yahoo.com
@@ -51,7 +51,8 @@
 
 /* memory info */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_TEXT_BASE		0x01000000
+#define CONFIG_SYS_SDRAM_BASE		0x00000000
+#define CONFIG_MAX_RAM_BANK_SIZE	(128 << 20)	/* 128 MB */
 
 /* timer set up */
 #define CONFIG_SYS_TIMER_CLKDIV		35
@@ -112,7 +113,7 @@
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_RBTREE
-#endif
+#endif /* CONFIG_NAND_POLLUX */
 
 /* nand environment */
 #ifdef CONFIG_NAND_POLLUX
@@ -132,9 +133,6 @@
 
 /* other stuff */
 #define CONFIG_CMD_ECHO
-#define CONFIG_CMD_MEMORY
-#define CONFIG_SYS_MEMTEST_START	0x01800000
-#define CONFIG_SYS_MEMTEST_END		0x40000000
 
 /* storage */
 #ifdef CONFIG_USB_OHCI_NEW
@@ -159,16 +157,18 @@
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_SYS_BARGSIZE		1024
-#define CONFIG_SYS_LOAD_ADDR		0x01800000
 
 /* U-Boot memory configuration */
+#define CONFIG_CMD_MEMORY
 #define CONFIG_STACKSIZE		(256 << 10)	/* 256 KiB */
 #define CONFIG_SYS_MALLOC_LEN \
 	(CONFIG_ENV_SIZE + (1 << 20))
-#define CONFIG_MAX_RAM_BANK_SIZE	(128 << 20)	/* 128 MB */
-#define CONFIG_SYS_SDRAM_BASE		0x00000000
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_SDRAM_BASE + 0x8000 - GENERATED_GBL_DATA_SIZE)
+#define CONFIG_SYS_LOAD_ADDR		0x01800000
+#define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_LOAD_ADDR
+#define CONFIG_SYS_MEMTEST_END		CONFIG_MAX_RAM_BANK_SIZE
+#define CONFIG_SYS_TEXT_BASE		0x01000000
 
 /* mtd layout */
 #define MTDIDS_DEFAULT \
