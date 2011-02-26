@@ -29,12 +29,11 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(SOC).o
 
-COBJS	= dram.o \
-	  reset.o \
-	  timer.o
+COBJS-y				+= dram.o reset.o timer.o
+COBJS-$(CONFIG_USB_OHCI_NEW)	+= usb.o
 
-SRCS	:= $(START:.o=.S) $(COBJS:.o=.c)
-OBJS	:= $(addprefix $(obj),$(COBJS))
+SRCS	:= $(START:.o=.S) $(COBJS-y:.o=.c)
+OBJS	:= $(addprefix $(obj),$(SOBJS) $(COBJS-y))
 START	:= $(addprefix $(obj),$(START))
 
 all:	$(obj).depend $(LIB)

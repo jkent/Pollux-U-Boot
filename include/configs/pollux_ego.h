@@ -47,6 +47,7 @@
 
 #include <asm/arch/uart.h>
 #include <asm/arch/nand.h>
+#include <asm/arch/ohci.h>
 
 /* memory info */
 #define CONFIG_NR_DRAM_BANKS		1
@@ -76,9 +77,17 @@
 #define CONFIG_SYS_NAND_QUIET_TEST
 #define CONFIG_SYS_NAND_SW_ECC
 
+/* ohci configuration */
+#define CONFIG_USB_OHCI_NEW
+#define CONFIG_SYS_USB_OHCI_CPU_INIT
+#define CONFIG_SYS_USB_OHCI_SLOT_NAME	"pollux"
+#define CONFIG_SYS_USB_OHCI_REGS_BASE	OHCI_BASE
+#define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS 1
+#define CONFIG_USB_STORAGE
+#define CONFIG_CMD_USB
+
 /* console/printing setup */
 #define CONFIG_AUTO_COMPLETE
-#define CONFIG_CMD_ECHO
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_SYS_HUSH_PARSER
 #define CONFIG_SYS_PROMPT		"U-Boot# "
@@ -115,8 +124,15 @@
 
 /* other environment */
 #define CONFIG_CMD_ASKENV
+#define CONFIG_CMD_ECHO
 #define CONFIG_CMD_EDITENV
 #define CONFIG_CMD_RUN
+
+/* storage */
+#ifdef CONFIG_USB_OHCI_NEW
+#define CONFIG_CMD_FAT
+#define CONFIG_DOS_PARTITION
+#endif /* CONFIG_USB_OHCI_NEW */
 
 /* networking */
 #ifdef CONFIG_DRIVER_DM9000

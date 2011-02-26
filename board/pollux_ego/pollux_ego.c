@@ -83,15 +83,21 @@ int board_init(void)
 	gd->bd->bi_arch_number = MACH_TYPE_DIDJ;
 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
 
-	/* set bus and cpu clock source and dividers */
-	writel((15<<26) | CLKPWR_CPUPLL(0) | CLKPWR_CPUDIV(1) |
-		CLKPWR_AHBDIV(4) | CLKPWR_BCLKPLL(0) | CLKPWR_BCLKDIV(4),
+	/* set cpu clock source and dividers */
+	tmp = readl(&clkpwr->clkmodereg) & ~(0x3FF);
+	writel(tmp | CLKPWR_CPUPLL(0) | CLKPWR_CPUDIV(1) | CLKPWR_AHBDIV(4),
+		&clkpwr->clkmodereg);
+
+	/* set bus clock source and divider */
+	tmp = readl(&clkpwr->clkmodereg) & ~(0x3F<<20);
+	writel(tmp | CLKPWR_BCLKPLL(0) | CLKPWR_BCLKDIV(4),
 		&clkpwr->clkmodereg);
 
 	/* PLL0 (cpu clock) 528000000 Hz */
 	writel(CLKPWR_PDIV(9) | CLKPWR_MDIV(176) | CLKPWR_SDIV(0),
 		&clkpwr->pllsetreg0);
 
+	/* enable PLL1 */
 	writel(readl(&clkpwr->clkmodereg) & ~CLKPWR_PLLPWDN1,
 		&clkpwr->clkmodereg);
 
