@@ -72,7 +72,7 @@ struct pollux_ohci {
 #define OHCI_DNPD			4
 
 /* clkenb */
-#define OHCI_USBH_CLKENB			0
+#define OHCI_USBH_CLKENB		0
 #define OHCI_CLKGENENB			2
 #define OHCI_PCLKMODE			3
 

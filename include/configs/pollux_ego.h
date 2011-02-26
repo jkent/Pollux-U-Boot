@@ -95,7 +95,7 @@
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_CBSIZE		1024
-#define CONFIG_SYS_PBSIZE 		\
+#define CONFIG_SYS_PBSIZE \
 	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_MAXARGS		16
 
@@ -105,6 +105,8 @@
 #define CONFIG_CMD_NAND
 #define CONFIG_CMD_NAND_LOCK_UNLOCK
 #define CONFIG_CMD_UBI
+#define CONFIG_CMD_UBIFS
+#define CONFIG_LZO
 /*#define CONFIG_MTD_DEBUG
 #define CONFIG_MTD_DEBUG_VERBOSE	3*/
 #define CONFIG_MTD_DEVICE
@@ -116,18 +118,23 @@
 #ifdef CONFIG_NAND_POLLUX
 #undef CONFIG_ENV_IS_NOWHERE
 #undef CONFIG_ENV_SIZE
-#define CONFIG_ENV_SIZE			(256 << 10)	/* 256 KiB */
+#define CONFIG_ENV_SIZE			(512 << 10)	/* 512 KiB */
 #define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET		0x00380000
+#define CONFIG_ENV_OFFSET		0x00280000
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_CMD_SAVEENV
 #endif /* CONFIG_NAND_POLLUX */
 
 /* other environment */
 #define CONFIG_CMD_ASKENV
-#define CONFIG_CMD_ECHO
 #define CONFIG_CMD_EDITENV
 #define CONFIG_CMD_RUN
+
+/* other stuff */
+#define CONFIG_CMD_ECHO
+#define CONFIG_CMD_MEMORY
+#define CONFIG_SYS_MEMTEST_START	0x01800000
+#define CONFIG_SYS_MEMTEST_END		0x40000000
 
 /* storage */
 #ifdef CONFIG_USB_OHCI_NEW
@@ -144,6 +151,10 @@
 #define CONFIG_NET_RETRY_COUNT		10
 #endif /* CONFIG_DRIVER_DM9000 */
 
+/* autoboot */
+#define CONFIG_BOOTDELAY		3
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+
 /* Linux interfacing */
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
@@ -152,14 +163,23 @@
 
 /* U-Boot memory configuration */
 #define CONFIG_STACKSIZE		(256 << 10)	/* 256 KiB */
-#define CONFIG_SYS_MALLOC_LEN		(1 << 20)	/* 1 MiB */
+#define CONFIG_SYS_MALLOC_LEN \
+	(CONFIG_ENV_SIZE + (1 << 20))
 #define CONFIG_MAX_RAM_BANK_SIZE	(128 << 20)	/* 128 MB */
 #define CONFIG_SYS_SDRAM_BASE		0x00000000
-#define CONFIG_SYS_INIT_SP_ADDR		\
+#define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_SDRAM_BASE + 0x8000 - GENERATED_GBL_DATA_SIZE)
 
-#define CONFIG_CMD_MEMORY
-#define CONFIG_SYS_MEMTEST_START	0x01800000
-#define CONFIG_SYS_MEMTEST_END		0x40000000
+/* mtd layout */
+#define MTDIDS_DEFAULT \
+	"nand0=pollux_nand.0,nand1=pollux_nand.1"
+#define PART_RECOVERY			"512k(Recovery)ro,"
+#define PART_UBOOT			"2m(U-Boot),"
+#define PART_ENV			"512k(U-Boot env),"
+#define PART_KERNEL			"13m(Kernel Vol),"
+#define PART_REST			"-(Root Vol)"
+#define MTDPARTS_DEFAULT \
+	"mtdparts=pollux_nand.0:" PART_RECOVERY PART_UBOOT PART_ENV \
+	PART_KERNEL PART_REST
 
 #endif	/* __CONFIG_H */
