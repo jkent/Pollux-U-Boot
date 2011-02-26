@@ -76,6 +76,7 @@
 #define CONFIG_SYS_NAND_BASE		NAND_SHADOW_BASE
 #define CONFIG_SYS_NAND_QUIET_TEST
 #define CONFIG_SYS_NAND_SW_ECC
+/*#define CONFIG_SYS_NAND_USE_FLASH_BBT*/
 
 /* ohci configuration */
 #define CONFIG_USB_OHCI_NEW

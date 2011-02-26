@@ -29,8 +29,8 @@
 
 /* TODO: combine with s3c64xx? */
 
-static struct pollux_mcus *mcus = (struct pollux_mcus *)MCUS_BASE;
-static struct pollux_nand *nand = (struct pollux_nand *)CONFIG_SYS_NAND_BASE;
+static struct pollux_mcus *mcus = (struct pollux_mcus *) MCUS_BASE;
+static struct pollux_nand *nand = (struct pollux_nand *) CONFIG_SYS_NAND_BASE;
 
 static void pollux_select_chip(struct mtd_info *mtd, int chipnr)
 {
@@ -73,6 +73,10 @@ int pollux_nand_init(struct nand_chip *this)
 
 	this->IO_ADDR_R	= (void __iomem *) &nand->nfdata;
 	this->IO_ADDR_W	= (void __iomem *) &nand->nfdata;
+
+#ifdef CONFIG_SYS_NAND_USE_FLASH_BBT
+	this->options |= NAND_USE_FLASH_BBT;
+#endif /* CONFIG_SYS_NAND_USE_FLASH_BBT */
 
 	this->ecc.mode = NAND_ECC_SOFT;
 
