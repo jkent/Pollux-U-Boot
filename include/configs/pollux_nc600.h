@@ -173,14 +173,14 @@
 
 /* mtd layout */
 #define MTDIDS_DEFAULT \
-	"nand0=pollux_nand.0,nand1=pollux_nand.1"
+	"nand0=nand0"
 #define PART_RECOVERY			"512k(Recovery)ro,"
 #define PART_UBOOT			"2m(U-Boot),"
 #define PART_ENV			"512k(U-Boot env),"
-#define PART_KERNEL			"13m(Kernel Vol),"
+#define PART_KERNEL			"6m(Kernel Vol),"
 #define PART_REST			"-(Root Vol)"
 #define MTDPARTS_DEFAULT \
-	"mtdparts=pollux_nand.0:" PART_RECOVERY PART_UBOOT PART_ENV \
+	"mtdparts=nand0:" PART_RECOVERY PART_UBOOT PART_ENV \
 	PART_KERNEL PART_REST
 
 #endif	/* __CONFIG_H */
