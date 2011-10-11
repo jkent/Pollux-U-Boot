@@ -121,7 +121,7 @@
 #undef CONFIG_ENV_SIZE
 #define CONFIG_ENV_SIZE			(512 << 10)	/* 512 KiB */
 #define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET		0x00280000
+#define CONFIG_ENV_OFFSET		0x00080000
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_CMD_SAVEENV
 #endif /* CONFIG_NAND_POLLUX */
@@ -175,12 +175,12 @@
 #define MTDIDS_DEFAULT \
 	"nand0=nand0"
 #define PART_RECOVERY			"512k(Recovery)ro,"
-#define PART_UBOOT			"2m(U-Boot),"
 #define PART_ENV			"512k(U-Boot env),"
+#define PART_UBOOT			"1m(U-Boot),"
 #define PART_KERNEL			"6m(Kernel Vol),"
 #define PART_REST			"-(Root Vol)"
 #define MTDPARTS_DEFAULT \
-	"mtdparts=nand0:" PART_RECOVERY PART_UBOOT PART_ENV \
+	"mtdparts=nand0:" PART_RECOVERY PART_ENV PART_UBOOT \
 	PART_KERNEL PART_REST
 
 #endif	/* __CONFIG_H */
