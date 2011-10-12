@@ -73,7 +73,7 @@
 
 /* nand configuration */
 #define CONFIG_NAND_POLLUX
-#define CONFIG_SYS_MAX_NAND_DEVICE	2
+#define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		NAND_SHADOW_BASE
 #define CONFIG_SYS_NAND_QUIET_TEST
 #define CONFIG_SYS_NAND_SW_ECC
@@ -173,14 +173,33 @@
 
 /* mtd layout */
 #define MTDIDS_DEFAULT \
-	"nand0=nand0"
-#define PART_RECOVERY			"512k(Recovery)ro,"
-#define PART_ENV			"512k(U-Boot env),"
-#define PART_UBOOT			"1m(U-Boot),"
-#define PART_KERNEL			"6m(Kernel Vol),"
-#define PART_REST			"-(Root Vol)"
+	"nand0=gen_nand"
+#define PART_BOOT			"512k(boot)ro,"
+#define PART_ENV			"512k(env),"
+#define PART_UBOOT			"1m(uboot),"
+#define PART_KERNEL			"6m(kernel),"
+#define PART_ROOT			"-(root)"
 #define MTDPARTS_DEFAULT \
-	"mtdparts=nand0:" PART_RECOVERY PART_ENV PART_UBOOT \
-	PART_KERNEL PART_REST
+	"mtdparts=gen_nand:" PART_BOOT PART_ENV PART_UBOOT \
+	PART_KERNEL PART_ROOT
+
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"set_nfs=setenv bootargs root=/dev/nfs rw " \
+		"nfsroot=$nfsroot\0" \
+	"add_ip=setenv bootargs $bootargs " \
+		"ip=dhcp\0" \
+	"add_tty=setenv bootargs $bootargs " \
+		"console=ttyS0,$baudrate\0" \
+	"add_mtd=setenv bootargs $bootargs " \
+		"$mtdparts\0" \
+	"add_misc=setenv bootargs $bootargs " \
+		"mem=46M\0" \
+	"ethaddr=02:03:04:05:06:07\0" \
+	"bootfile=uImage\0" \
+	"nfsroot=192.168.254.1:/nfsroot\0" \
+	"net_nfs=dhcp;" \
+		"run set_nfs add_ip add_tty add_mtd add_misc;" \
+		"bootm\0" \
+	"bootcmd=run net_nfs\0"
 
 #endif	/* __CONFIG_H */
