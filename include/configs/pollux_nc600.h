@@ -35,7 +35,7 @@
 #define CONFIG_SYS_CONSOLE_INFO_QUIET
 #define CONFIG_SKIP_RELOCATE_UBOOT
 #define CONFIG_ENV_IS_NOWHERE
-#define CONFIG_ENV_SIZE			(32 << 10)	/* 32 KiB */
+#define CONFIG_ENV_SIZE			(64 << 10)	/* 64 KiB */
 
 /* SoC configuration */
 #define CONFIG_ARM926EJS
@@ -119,9 +119,9 @@
 #ifdef CONFIG_NAND_POLLUX
 #undef CONFIG_ENV_IS_NOWHERE
 #undef CONFIG_ENV_SIZE
-#define CONFIG_ENV_SIZE			(512 << 10)	/* 512 KiB */
+#define CONFIG_ENV_SIZE			(64 << 10)	/* 64 KiB */
 #define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET		0x00080000
+#define CONFIG_ENV_OFFSET		0x00070000
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_CMD_SAVEENV
 #endif /* CONFIG_NAND_POLLUX */
@@ -174,32 +174,36 @@
 /* mtd layout */
 #define MTDIDS_DEFAULT \
 	"nand0=gen_nand"
-#define PART_BOOT			"512k(boot)ro,"
-#define PART_ENV			"512k(env),"
-#define PART_UBOOT			"1m(uboot),"
-#define PART_KERNEL			"6m(kernel),"
-#define PART_ROOT			"-(root)"
+#define PART_UBOOT			"448k(U-Boot)ro,"
+#define PART_UBOOT_ENV			"64k(U-Boot_env),"
+#define PART_UIMAGE			"3584k(uImage),"
+#define PART_ROOTFS			"-(rootfs)"
 #define MTDPARTS_DEFAULT \
-	"mtdparts=gen_nand:" PART_BOOT PART_ENV PART_UBOOT \
-	PART_KERNEL PART_ROOT
+	"mtdparts=gen_nand:" PART_UBOOT PART_UBOOT_ENV \
+		PART_UIMAGE PART_ROOTFS
 
-#define CONFIG_EXTRA_ENV_SETTINGS \
-	"set_nfs=setenv bootargs root=/dev/nfs rw " \
-		"nfsroot=$nfsroot\0" \
-	"add_ip=setenv bootargs $bootargs " \
-		"ip=dhcp\0" \
-	"add_tty=setenv bootargs $bootargs " \
-		"console=ttyS0,$baudrate\0" \
-	"add_mtd=setenv bootargs $bootargs " \
-		"$mtdparts\0" \
-	"add_misc=setenv bootargs $bootargs " \
-		"mem=46M\0" \
-	"ethaddr=02:03:04:05:06:07\0" \
-	"bootfile=uImage\0" \
-	"nfsroot=192.168.254.1:/nfsroot\0" \
-	"net_nfs=dhcp;" \
-		"run set_nfs add_ip add_tty add_mtd add_misc;" \
-		"bootm\0" \
+#define CONFIG_EXTRA_ENV_SETTINGS				\
+	"set_nfs=setenv bootargs root=/dev/nfs rw "		\
+		"nfsroot=$nfsroot\0"				\
+	"set_nand=setenv bootargs root=ubi0:rootfs rw "		\
+		"rootfstype=ubifs ubi.mtd=3\0"			\
+	"add_ip=setenv bootargs $bootargs "			\
+		"ip=dhcp\0"					\
+	"add_tty=setenv bootargs $bootargs "			\
+		"console=ttyS0,$baudrate\0"			\
+	"add_mtd=setenv bootargs $bootargs "			\
+		"$mtdparts\0"					\
+	"add_misc=setenv bootargs $bootargs "			\
+		"mem=46M\0"					\
+	"ethaddr=02:03:04:05:06:07\0"				\
+	"bootfile=uImage\0"					\
+	"nfsroot=192.168.254.1:/nfsroot\0"			\
+	"net_nfs=dhcp;"						\
+		"run set_nfs add_ip add_tty add_mtd add_misc;"	\
+		"bootm\0"					\
+	"nand_local=nboot uImage;"				\
+		"run set_nand add_tty add_mtd add_misc;"	\
+		"bootm\0"					\
 	"bootcmd=run net_nfs\0"
 
 #endif	/* __CONFIG_H */
